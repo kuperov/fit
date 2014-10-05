@@ -1,0 +1,11 @@
+Package: fit
+Type: Package
+Title: Import GPS data from FIT files
+Version: 0.1
+Date: 2014-10-04
+Author: Alex Cooper
+Maintainer: Alex Cooper <alex@acooper.org>
+Description: The FIT protocol is used to transmit and store data for a range of GPS and fitness devices. This package was written to download data from a Garmin Edge 500, although it may work with a wider range of devices.
+License: The majority of the code included in this package is provided under the ANT+ Shared Source License. The remainder is provided under the MIT license. See individual source files for details.
+Imports: Rcpp (>= 0.11.2)
+LinkingTo: Rcpp
