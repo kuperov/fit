@@ -1,2 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^examples$
+^README
+^figure$
+^ggmapTemp.png$
+
