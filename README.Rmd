@@ -115,11 +115,11 @@ ggmap(map, extent = "device") +
              data = commute, size = 1, colour = 'blue')
 ```
 
-But now look at the measured altitude over the same distance. The Bridge is cambered, so that its center is higher than the edges, but the road certainly isn't jaggedly stepped as the chart below suggests. In reality, the bike would have travelled a smooth path, passing between the measured points. So the vertical error, although probably not all that big in absolute terms, is certainly large relative to the total vertical distance travelled.
+But now look at the measured altitude over the same distance. The Bridge is cambered, so that its center is higher than the edges, but the road certainly isn't as jagged as the chart below suggests. (The steep drop at the 2km mark marks the stairs at the North Sydney end.) In reality, the bike would have travelled a smooth path, passing between the measured points. So the vertical error, although probably not all that big in absolute terms, is certainly large relative to the total vertical distance travelled.
 ```{r, fig.width=8}
-ggplot(commute, aes(y=altitude/10, x=timestamp)) + 
+ggplot(commute, aes(y=altitude*1e-1, x=distance*1e-2)) + 
   geom_path() + ggtitle("Harbour Bridge bike lane: measured altitude") +
-  xlab("time stamp (s)") + ylab("altitude (m)")
+  xlab("distance (m)") + ylab("altitude (m)")
 ```
 
 Do have fun with the `fit` package and let me know if you do anything interesting with it.

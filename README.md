@@ -30,6 +30,10 @@ Here's an example GPS file, from a ride to Mt Beauty in Victoria, Australia:
 ```r
 library(fit)
 data <- read.fit('examples/mt_beauty.fit')
+```
+The names of the available data tables can be found using `names()`. 
+
+```r
 names(data)
 ```
 
@@ -37,7 +41,7 @@ names(data)
 ## [1] "file_id"      "session"      "lap"          "record"       "event"        "device_info"  "activity"     "file_creator"
 ## [9] "unknown"
 ```
-The names of the available data tables can be found using `names()`. My device records exercise progress as `record` messages every few seconds, so we're interested in the `record` table:
+My Garmin records exercise progress as `record` messages every few seconds, so if we want to analyse a ride we'd be interested in the `record` table:
 
 ```r
 head(data$record)
@@ -80,7 +84,7 @@ ggplot(pdata, aes(y=alt, x=time)) + geom_line() +
   ggtitle("Elevation vs Time") + xlab("time (minutes)") + ylab("elevation (m)")
 ```
 
-![plot of chunk unnamed-chunk-4](figure/unnamed-chunk-4.png) 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5.png) 
 
 Now let's try to answer a more interesting question: how much harder does my heart work when I'm riding uphill?
 
@@ -102,7 +106,7 @@ ggplot(pdata, aes(x=gradient, y=heart_rate)) +
   ggtitle("Heart rate vs gradient")
 ```
 
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5.png) 
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6.png) 
 
 Making maps
 -----------
@@ -126,7 +130,7 @@ ggmap(map) +
   ggtitle("Mt Beauty, 23 January 2014")
 ```
 
-![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6.png) 
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7.png) 
 
 The GPS coordinates are suprisingly accurate. We discussed above that the altitude data is fairly noisy, although this is mostly because altitudes are given as integers, and there isn't much vertical movement when you ride. This means that round-off error is large compared to actual vertical movement, and so contributes a lot to the signal-to-noise ratio. But the opposite seems to be true for the longitude and latitude: the error is very small compared to actual horizontal movement.
 
@@ -140,16 +144,16 @@ ggmap(map, extent = "device") +
              data = commute, size = 1, colour = 'blue')
 ```
 
-![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7.png) 
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8.png) 
 
-But now look at the measured altitude over the same distance. The Bridge is cambered, so that its center is higher than the edges, but the road certainly isn't jaggedly stepped as the chart below suggests. In reality, the bike would have travelled a smooth path, passing between the measured points. So the vertical error, although probably not all that big in absolute terms, is certainly large relative to the total vertical distance travelled.
+But now look at the measured altitude over the same distance. The Bridge is cambered, so that its center is higher than the edges, but the road certainly isn't as jagged as the chart below suggests. (The steep drop at the 2km mark marks the stairs at the North Sydney end.) In reality, the bike would have travelled a smooth path, passing between the measured points. So the vertical error, although probably not all that big in absolute terms, is certainly large relative to the total vertical distance travelled.
 
 ```r
-ggplot(commute, aes(y=altitude/10, x=timestamp)) + 
+ggplot(commute, aes(y=altitude*1e-1, x=distance*1e-2)) + 
   geom_path() + ggtitle("Harbour Bridge bike lane: measured altitude") +
-  xlab("time stamp (s)") + ylab("altitude (m)")
+  xlab("distance (m)") + ylab("altitude (m)")
 ```
 
-![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8.png) 
+![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9.png) 
 
 Do have fun with the `fit` package and let me know if you do anything interesting with it.
