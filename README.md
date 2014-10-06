@@ -128,9 +128,9 @@ ggmap(map) +
 
 ![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6.png) 
 
-The GPS coordinates are suprisingly accurate. We discussed above that the altitude data is fairly noisy, although this is mostly because altitudes are given as integers, and there isn't much vertical movement when you ride. This means that round-off error is large compared to actual vertical movement, and so contributes a lot to the signal-to-noise ratio.
+The GPS coordinates are suprisingly accurate. We discussed above that the altitude data is fairly noisy, although this is mostly because altitudes are given as integers, and there isn't much vertical movement when you ride. This means that round-off error is large compared to actual vertical movement, and so contributes a lot to the signal-to-noise ratio. But the opposite seems to be true for the longitude and latitude: the error is very small compared to actual horizontal movement.
 
-Check out this excerpt of my daily commute, which runs along the bike path on the western side of the Sydney Harbour Bridge. The GPS path tracks the bike path almost exactly the whole way:
+For a visual illustration, check out this excerpt of my daily commute, which runs along the bike path on the western side of the Sydney Harbour Bridge. The GPS path tracks the bike lane accurately the whole way:
 
 ```r
 load('examples/commute.rda') # subset of a daily commute (R data format)
@@ -141,3 +141,15 @@ ggmap(map, extent = "device") +
 ```
 
 ![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7.png) 
+
+But now look at the measured altitude over the same distance. The Bridge is cambered, so that its center is higher than the edges, but the road certainly isn't jaggedly stepped as the chart below suggests. In reality, the bike would have travelled a smooth path, passing between the measured points. So the vertical error, although probably not all that big in absolute terms, is certainly large relative to the total vertical distance travelled.
+
+```r
+ggplot(commute, aes(y=altitude/10, x=timestamp)) + 
+  geom_path() + ggtitle("Harbour Bridge bike lane: measured altitude") +
+  xlab("time stamp (s)") + ylab("altitude (m)")
+```
+
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8.png) 
+
+Do have fun with the `fit` package and let me know if you do anything interesting with it.
