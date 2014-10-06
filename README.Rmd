@@ -63,11 +63,12 @@ ggplot(pdata, aes(y=alt, x=time)) + geom_line() +
 
 Now let's try to answer a more interesting question: how much harder does my heart work when I'm riding uphill?
 
-We can compute the average gradient using the familiar formula, 
-$$\text{gradient} = \frac{\text{change in elevation}}{\text{distance travelled}}.$$ 
-The elevation readings are pretty noisy and only measured in whole meters, so I'll smooth the gradients by averaging over 10 observations, which is about 30-40 seconds of riding. (We can do better than averaging, using a Kalman filter, but that's probably overkill for now.)
+We can compute the average gradient using the familiar formula, `gradient = change in elevation/distance travelled`. 
+The elevation readings are pretty noisy and only measured in whole meters, so I'll smooth the gradients by averaging over 10 observations, which is about 30-40 seconds of riding. (We can actually do better than this, using a Kalman filter or similar, but that's overkill for what we need now.)
 
-As we might expect, the relationship is upward sloping: the steeper the hill, the faster my heart is working. Travelling down hill (negative gradient) is the easiest, and my heart is usually beating 150-170 beats per minute. But uphill, my heart can be doing anything from 170 to 205 or so when it's really steep. (Ouch!) And what's really interesting is that the relationship is non-linear: as the road gets steeper, the increase in heart rate diminishes. This is probably because there's only so hard my heart can actually beat---and rather than suffer cardiac arrest, I slow the bike down a bit and let my heart muscle rest.
+As we might expect, the relationship is upward sloping: the steeper the hill, the faster my heart is working. Travelling down hill (negative gradient) is the easiest, and my heart is usually beating 150-170 beats per minute. But uphill, my heart can be doing anything from 170 to 205 or so when it's really steep. (Ouch!) 
+
+And what's really interesting is that the relationship is non-linear: as the road gets steeper, the increase in heart rate diminishes. This is probably because there's only so hard my heart can actually beat---and rather than suffer cardiac arrest, I slow the bike down a bit and let my heart muscle rest.
 ```{r}
 pdata <- data$record[-(1:10),c("heart_rate","timestamp")]
 # compute average gradient, as %
@@ -91,11 +92,11 @@ garmin.data <- read.fit('examples/mt_beauty.fit')
 points <- subset(garmin.data$record, complete.cases(garmin.data$record))
 
 map <- get_googlemap(center = colMeans(points[,c('position_long','position_lat')]),
-                     zoom = 12, size=c(640,480), maptype = c("hybrid"))
+                     zoom = 12, maptype = c("hybrid"))
 
 ggmap(map) +
   geom_path(aes(x = position_long, y = position_lat, colour = heart_rate),
-             data = points, size = 3) +
+             data = points, size = 2) +
   scale_colour_gradientn(colours = rainbow(3)) +
   ggtitle("Mt Beauty, 23 January 2014")
 ```
