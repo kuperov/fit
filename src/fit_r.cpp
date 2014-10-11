@@ -131,6 +131,7 @@ public:
                         value = -1;
                         break;
                 }
+                value = value / field->GetScale() - field->GetOffset();
                 column[message_no] = value;
             } // for value
         } // for field
