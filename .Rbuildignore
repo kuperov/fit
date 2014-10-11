@@ -4,4 +4,9 @@
 ^README
 ^figure$
 ^ggmapTemp.png$
-
+^.Rhistory$
+^.gitignore$
+^.Rproj.user$
+^.git$
+^src\symbols.rds$
+.DS_Store$

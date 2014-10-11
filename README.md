@@ -49,12 +49,12 @@ head(data$record)
 
 ```
 ##   altitude cadence distance heart_rate position_lat position_long speed temperature timestamp
-## 1     3839      78      874        159       -36.72         146.9  8739          31 759393569
-## 2     3839      78     3420        162       -36.72         146.9  8465          31 759393572
-## 3     3839      80     5987        164       -36.72         146.9  8634          31 759393575
-## 4     3839      82    10436        167       -36.72         146.9  8994          31 759393580
-## 5     3837      82    12235        167       -36.72         146.9  9032          31 759393582
-## 6     3837      82    13134        167       -36.72         146.9  8994          31 759393583
+## 1    267.8      78     8.74        159       -36.72         146.9 8.739          31 759393569
+## 2    267.8      78    34.20        162       -36.72         146.9 8.465          31 759393572
+## 3    267.8      80    59.87        164       -36.72         146.9 8.634          31 759393575
+## 4    267.8      82   104.36        167       -36.72         146.9 8.994          31 759393580
+## 5    267.4      82   122.35        167       -36.72         146.9 9.032          31 759393582
+## 6    267.4      82   131.34        167       -36.72         146.9 8.994          31 759393583
 ```
 
 The table contais data like GPS coordinates (latitude, longitude, altitude), cadence, heart rate, speed 
@@ -79,7 +79,7 @@ Here's a plot of my elevation, in meters, as a function of the number of minutes
 
 ```r
 library(ggplot2)
-pdata <- with(data$record, data.frame(alt = altitude*0.1, time = (timestamp-timestamp[1])/60))
+pdata <- with(data$record, data.frame(alt = altitude, time = (timestamp-timestamp[1])/60))
 ggplot(pdata, aes(y=alt, x=time)) + geom_line() +
   ggtitle("Elevation vs Time") + xlab("time (minutes)") + ylab("elevation (m)")
 ```
@@ -98,7 +98,7 @@ And what's really interesting is that the relationship is non-linear: as the roa
 ```r
 pdata <- data$record[-(1:10),c("heart_rate","timestamp")]
 # compute average gradient, as %
-pdata$gradient <- with(data$record, 100 * diff(altitude * 0.1,lag=10) / diff(distance * 0.01,lag=10))
+pdata$gradient <- with(data$record, 100 * diff(altitude,lag=10) / diff(distance,lag=10))
 pdata <- subset(pdata, complete.cases(pdata) & abs(gradient) < 7.5 & gradient != 0) # drop outliers
 ggplot(pdata, aes(x=gradient, y=heart_rate)) + 
   geom_point(alpha=0.5) + geom_jitter() +
@@ -149,11 +149,11 @@ ggmap(map, extent = "device") +
 But now look at the measured altitude over the same distance. The Bridge is cambered, so that its center is higher than the edges, but the road certainly isn't as jagged as the chart below suggests. (The steep drop at the 2km mark marks the stairs at the North Sydney end.) In reality, the bike would have travelled a smooth path, passing between the measured points. So the vertical error, although probably not all that big in absolute terms, is certainly large relative to the total vertical distance travelled.
 
 ```r
-ggplot(commute, aes(y=altitude*1e-1, x=distance*1e-2)) + 
-  geom_path() + ggtitle("Harbour Bridge bike lane: measured altitude") +
+ggplot(commute, aes(y=altitude, x=distance)) + 
+  geom_path() + ggtitle("Harbour Bridge bike lane: measured elevation") +
   xlab("distance (m)") + ylab("altitude (m)")
 ```
 
 ![plot of chunk unnamed-chunk-9](figure/unnamed-chunk-9.png) 
 
-Do have fun with the `fit` package and let me know if you do anything interesting with it.
+Have fun.

@@ -59,7 +59,7 @@ Example analysis
 Here's a plot of my elevation, in meters, as a function of the number of minutes I was riding. (It was a fairly decent hill!)
 ```{r}
 library(ggplot2)
-pdata <- with(data$record, data.frame(alt = altitude*0.1, time = (timestamp-timestamp[1])/60))
+pdata <- with(data$record, data.frame(alt = altitude, time = (timestamp-timestamp[1])/60))
 ggplot(pdata, aes(y=alt, x=time)) + geom_line() +
   ggtitle("Elevation vs Time") + xlab("time (minutes)") + ylab("elevation (m)")
 ```
@@ -75,7 +75,7 @@ And what's really interesting is that the relationship is non-linear: as the roa
 ```{r}
 pdata <- data$record[-(1:10),c("heart_rate","timestamp")]
 # compute average gradient, as %
-pdata$gradient <- with(data$record, 100 * diff(altitude * 0.1,lag=10) / diff(distance * 0.01,lag=10))
+pdata$gradient <- with(data$record, 100 * diff(altitude,lag=10) / diff(distance,lag=10))
 pdata <- subset(pdata, complete.cases(pdata) & abs(gradient) < 7.5 & gradient != 0) # drop outliers
 ggplot(pdata, aes(x=gradient, y=heart_rate)) + 
   geom_point(alpha=0.5) + geom_jitter() +
@@ -115,11 +115,11 @@ ggmap(map, extent = "device") +
              data = commute, size = 1, colour = 'blue')
 ```
 
-But now look at the measured altitude over the same distance. The Bridge is cambered, so that its center is higher than the edges, but the road certainly isn't as jagged as the chart below suggests. (The steep drop at the 2km mark marks the stairs at the North Sydney end.) In reality, the bike would have travelled a smooth path, passing between the measured points. So the vertical error, although probably not all that big in absolute terms, is certainly large relative to the total vertical distance travelled.
+But now look at the measured altitude over the same distance. The Bridge is cambered, so that its center is higher than the edges, but the road certainly isn't as jagged as the chart below suggests. (The steep drop at 2km marks the stairs at the North Sydney end.) In reality, the bike would have travelled a smooth path, passing between the measured points. So the vertical error, although probably not all that big in absolute terms, is certainly large relative to the total vertical distance travelled in a ride.
 ```{r, fig.width=8}
-ggplot(commute, aes(y=altitude*1e-1, x=distance*1e-2)) + 
-  geom_path() + ggtitle("Harbour Bridge bike lane: measured altitude") +
+ggplot(commute, aes(y=altitude, x=distance)) + 
+  geom_path() + ggtitle("Harbour Bridge bike lane: measured elevation") +
   xlab("distance (m)") + ylab("altitude (m)")
 ```
 
-Do have fun with the `fit` package and let me know if you do anything interesting with it.
+Have fun.
