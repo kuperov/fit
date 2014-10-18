@@ -3,7 +3,7 @@ ANT+ FIT file decoder for R
 
 
 
-Reads FIT exercise files from a Garmin or other ANT+ devices into R. Developed for a Garmin Edge 500, but likely to work with other devices, too.
+This package reads FIT exercise files from a Garmin or other ANT+ device into R. It was developed for a Garmin Edge 500, but will probably work with other devices, too.
 
 This package incorporates code from the [ANT+ FIT SDK](http://www.thisisant.com/resources/fit).
 
@@ -152,18 +152,24 @@ library(ggmap)
 
 garmin.data <- read.fit('examples/mt_beauty.fit')
 points <- subset(garmin.data$record, complete.cases(garmin.data$record))
+points$time_min  <- with(points, timestamp - timestamp[1])/60 # minutes of riding
+# from diagram above, we turned around at the 90 minutes mark
+points$direction <- with(points, factor(ifelse(time_min < 90, 'Outbound leg', 'Return leg')))
 
 map <- get_googlemap(center = colMeans(points[,c('position_long','position_lat')]),
                      zoom = 12, maptype = c("hybrid"))
 
-ggmap(map) +
+ggmap(map, extent='panel') +
   geom_path(aes(x = position_long, y = position_lat, colour = heart_rate),
-             data = points, size = 2) +
+             data = points, size = 2) + 
+  facet_grid(direction~.) +
   scale_colour_gradientn(colours = rainbow(3)) +
-  ggtitle("Mt Beauty, 23 January 2014")
+  ggtitle("Mt Beauty, 23 January 2014") + ylab('latitude') + xlab('longitude')
 ```
 
 ![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8.png) 
+
+As might be expected, I was working *much* harder on the outward journey up the mountain (top panel), than on the cruise back down (bottom panel).
 
 The GPS coordinates are suprisingly accurate. We discussed above that the altitude data is fairly noisy, although this is mostly because altitudes are given as integers, and there isn't much vertical movement when you ride. This means that round-off error is large compared to actual vertical movement, and so contributes a lot to the signal-to-noise ratio. But the opposite seems to be true for the longitude and latitude: the error is very small compared to actual horizontal movement.
 
