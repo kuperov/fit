@@ -27,13 +27,11 @@ The package depends on `Rcpp`, and there are C++ sources to compile. So you need
 Getting started
 ---------------
 
-The FIT protocol organises data in a series of 'messages' of different types.
-Examples are exercise sessions, and laps. The fit package provides one data.frame
-per message type.
+The FIT protocol organises data in a series of 'messages' of different types that correspond to events like exercise sessions, and laps. The fit package provides a list of `data.frame` objects, one per message type.
 
-First you have to extract the file from the GPS device. On my Garmin Edge 500, the files can be found by plugging it in to the USB port, and opening the `Garmin/Activities` folder that appears on the USB device.
+The first step is to extract the file from the GPS device. On my Garmin Edge 500, the files can be found by plugging the USB cable, and opening the `Garmin/Activities` folder on the USB drive the device provides.
 
-Here's an example GPS file, from a ride to Mt Beauty in Victoria, Australia:
+Here's an example GPS file, from a ride to Mt Beauty in Victoria, Australia in early 2014:
 ```{r}
 library(fit)
 data <- read.fit('examples/mt_beauty.fit')
@@ -42,20 +40,19 @@ The names of the available data tables can be found using `names()`.
 ```{r}
 names(data)
 ```
-My Garmin records exercise progress as `record` messages every few seconds, so if we want to analyse a ride we'd be interested in the `record` table:
+The device provides status updates as `record` messages every few seconds, so to analyse a ride we want to use the `record` table:
 ```{r}
 head(data$record)
 ```
 
-The table contais data like GPS coordinates (latitude, longitude, altitude), cadence, heart rate, speed 
-and distance travelled, depending on which gadgets you have attached to your device. If you have a power
-meter, that data will show up here, too. 
+The table contais data like GPS coordinates (latitude, longitude), altitude, cadence, heart rate, speed 
+and distance travelled, depending on the particular gadgets you have attached to your device. If you have a power
+meter, wattage will show up here, too. 
 
-The units for each field are available in the table's 'units' attribute. 
+The units for each field are available in the table's 'units' attribute. The units are generally pretty sensible: distances are in metres, temperatures in Celsius, and cadence in bpm. Coordinates are converted from 'circles' into degrees.
 ```{r}
 attr(data$record,'units')
 ```
-
 The timestamp, given in seconds, is the time elapsed since Jan 1, 1990. You might want to subtract the first value in the table, which would give you the number of seconds elapsed in your session.
 
 Example analysis

@@ -23,28 +23,15 @@ The package depends on `Rcpp`, and there are C++ sources to compile. So you need
 Getting started
 ---------------
 
-The FIT protocol organises data in a series of 'messages' of different types.
-Examples are exercise sessions, and laps. The fit package provides one data.frame
-per message type.
+The FIT protocol organises data in a series of 'messages' of different types that correspond to events like exercise sessions, and laps. The fit package provides a list of `data.frame` objects, one per message type.
 
-First you have to extract the file from the GPS device. On my Garmin Edge 500, the files can be found by plugging it in to the USB port, and opening the `Garmin/Activities` folder that appears on the USB device.
+The first step is to extract the file from the GPS device. On my Garmin Edge 500, the files can be found by plugging the USB cable, and opening the `Garmin/Activities` folder on the USB drive the device provides.
 
-Here's an example GPS file, from a ride to Mt Beauty in Victoria, Australia:
+Here's an example GPS file, from a ride to Mt Beauty in Victoria, Australia in early 2014:
 
 ```r
 library(fit)
-```
-
-```
-## Error: there is no package called 'fit'
-```
-
-```r
 data <- read.fit('examples/mt_beauty.fit')
-```
-
-```
-## Error: could not find function "read.fit"
 ```
 The names of the available data tables can be found using `names()`. 
 
@@ -53,32 +40,38 @@ names(data)
 ```
 
 ```
-## NULL
+## [1] "file_id"      "session"      "lap"          "record"       "event"        "device_info"  "activity"     "file_creator"
+## [9] "unknown"
 ```
-My Garmin records exercise progress as `record` messages every few seconds, so if we want to analyse a ride we'd be interested in the `record` table:
+The device provides status updates as `record` messages every few seconds, so to analyse a ride we want to use the `record` table:
 
 ```r
 head(data$record)
 ```
 
 ```
-## Error: object of type 'closure' is not subsettable
+##   altitude cadence distance heart_rate position_lat position_long speed temperature timestamp
+## 1    267.8      78     8.74        159       -36.72         146.9 8.739          31 759393569
+## 2    267.8      78    34.20        162       -36.72         146.9 8.465          31 759393572
+## 3    267.8      80    59.87        164       -36.72         146.9 8.634          31 759393575
+## 4    267.8      82   104.36        167       -36.72         146.9 8.994          31 759393580
+## 5    267.4      82   122.35        167       -36.72         146.9 9.032          31 759393582
+## 6    267.4      82   131.34        167       -36.72         146.9 8.994          31 759393583
 ```
 
-The table contais data like GPS coordinates (latitude, longitude, altitude), cadence, heart rate, speed 
-and distance travelled, depending on which gadgets you have attached to your device. If you have a power
-meter, that data will show up here, too. 
+The table contais data like GPS coordinates (latitude, longitude), altitude, cadence, heart rate, speed 
+and distance travelled, depending on the particular gadgets you have attached to your device. If you have a power
+meter, wattage will show up here, too. 
 
-The units for each field are available in the table's 'units' attribute. 
+The units for each field are available in the table's 'units' attribute. The units are generally pretty sensible: distances are in metres, temperatures in Celsius, and cadence in bpm. Coordinates are converted from 'circles' into degrees.
 
 ```r
 attr(data$record,'units')
 ```
 
 ```
-## Error: object of type 'closure' is not subsettable
+## [1] "m"       "rpm"     "m"       "bpm"     "degrees" "degrees" "m/s"     "C"       "s"
 ```
-
 The timestamp, given in seconds, is the time elapsed since Jan 1, 1990. You might want to subtract the first value in the table, which would give you the number of seconds elapsed in your session.
 
 Example analysis
@@ -88,20 +81,11 @@ Here's a plot of my elevation, in meters, as a function of the number of minutes
 ```r
 library(ggplot2)
 pdata <- with(data$record, data.frame(alt = altitude, time = (timestamp-timestamp[1])/60))
-```
-
-```
-## Error: object of type 'closure' is not subsettable
-```
-
-```r
 ggplot(pdata, aes(y=alt, x=time)) + geom_line() +
   ggtitle("Elevation vs Time") + xlab("time (minutes)") + ylab("elevation (m)")
 ```
 
-```
-## Error: object 'pdata' not found
-```
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5.png) 
 
 Now let's try to answer a more interesting question: how much harder does my heart work when I'm riding uphill?
 
@@ -114,39 +98,16 @@ And what's really interesting is that the relationship is non-linear: as the roa
 
 ```r
 pdata <- data$record[-(1:10),c("heart_rate","timestamp")]
-```
-
-```
-## Error: object of type 'closure' is not subsettable
-```
-
-```r
 # compute average gradient, as %
 pdata$gradient <- with(data$record, 100 * diff(altitude,lag=10) / diff(distance,lag=10))
-```
-
-```
-## Error: object of type 'closure' is not subsettable
-```
-
-```r
 pdata <- subset(pdata, complete.cases(pdata) & abs(gradient) < 7.5 & gradient != 0) # drop outliers
-```
-
-```
-## Error: object 'pdata' not found
-```
-
-```r
 ggplot(pdata, aes(x=gradient, y=heart_rate)) + 
   geom_point(alpha=0.5) + geom_jitter() +
   stat_smooth(method="lm", formula=y ~ poly(x, 2)) +
   ggtitle("Heart rate vs gradient")
 ```
 
-```
-## Error: object 'pdata' not found
-```
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6.png) 
 
 Making maps
 -----------
@@ -158,30 +119,11 @@ In the map below, we get a map image from Google Maps, and overlay the path I tr
 library(ggmap)
 
 garmin.data <- read.fit('examples/mt_beauty.fit')
-```
-
-```
-## Error: could not find function "read.fit"
-```
-
-```r
 points <- subset(garmin.data$record, complete.cases(garmin.data$record))
-```
 
-```
-## Error: object 'garmin.data' not found
-```
-
-```r
 map <- get_googlemap(center = colMeans(points[,c('position_long','position_lat')]),
                      zoom = 12, maptype = c("hybrid"))
-```
 
-```
-## Error: object of type 'closure' is not subsettable
-```
-
-```r
 ggmap(map) +
   geom_path(aes(x = position_long, y = position_lat, colour = heart_rate),
              data = points, size = 2) +
@@ -189,9 +131,7 @@ ggmap(map) +
   ggtitle("Mt Beauty, 23 January 2014")
 ```
 
-```
-## Error: object 'map' not found
-```
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7.png) 
 
 The GPS coordinates are suprisingly accurate. We discussed above that the altitude data is fairly noisy, although this is mostly because altitudes are given as integers, and there isn't much vertical movement when you ride. This means that round-off error is large compared to actual vertical movement, and so contributes a lot to the signal-to-noise ratio. But the opposite seems to be true for the longitude and latitude: the error is very small compared to actual horizontal movement.
 
