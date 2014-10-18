@@ -14,11 +14,15 @@ This package incorporates code from the [ANT+ FIT SDK](http://www.thisisant.com/
 Install
 -------
 
-Download the [R source package](https://github.com/kuperov/fit/releases/download/v0.1/fit_0.1.tar.gz). Then in the same directory run the R command:
+The easiest way to install the package is directly from Github, using Hadley Wickham's `devtools` package, as follows: 
 ```R
-install.packages('fit_0.1.tar.gz')
+install.packages('devtools') # if you don't already have it
+library(devtools)
+install_github('kuperov/fit')
 ```
-The package depends on `Rcpp`, and will have to compile the ANT+ SDK C++ sources. If you have trouble compiling the code, please let me know. I'll see if I can hook you up with a binary package instead.
+Alternatively, you can download the [R source package](https://github.com/kuperov/fit/releases/download/v0.1/fit_0.1.tar.gz) and install with `install.packages('fit_0.1.tar.gz')`.
+
+The package depends on `Rcpp`, and there are C++ sources to compile. So you need a working C++ compiler. If you have trouble compiling the code, let me know and I'll see if I can hook you up with a binary package instead.
 
 Getting started
 ---------------
